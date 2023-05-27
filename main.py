@@ -105,9 +105,10 @@ class MainWindow(QMainWindow):
     def valid(self):
         first_name = self.first_name.text().strip()
         last_name = self.last_name.text().strip()
+        middle_name = self.middle_name.text().strip()
         birth_date = self.birth_date.text().strip()
         medical_id = self.medical_id.text().strip()
-        medical_history = self.medical_history.text().strip()
+        medical_history = self.medical_history.toPlainText()
 
         
         if not first_name:
@@ -119,6 +120,11 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, 'Ошибка', 'Введите фамилию')
             self.last_name.setFocus()
             return False
+        
+        if not middle_name:
+            QMessageBox.critical(self, 'Ошибка', 'Введите отчество')
+            self.middle_name.setFocus()
+            return False
 
         if not birth_date:
             QMessageBox.critical(self, 'Ошибка', 'Введите правильный возраст')
@@ -127,12 +133,12 @@ class MainWindow(QMainWindow):
 
         if not medical_id:
             QMessageBox.critical(self, 'Ошибка', 'Введите полис')
-            self.birth_date.setFocus()
+            self.medical_id.setFocus()
             return False
 
         if not medical_history:
             QMessageBox.critical(self, 'Ошибка', 'Введите полис')
-            self.birth_date.setFocus()
+            self.medical_history.setFocus()
             return False
 
         return True
@@ -140,7 +146,10 @@ class MainWindow(QMainWindow):
     def reset(self):
         self.first_name.clear()
         self.last_name.clear()
+        self.middle_name.clear()
         self.birth_date.clear()
+        self.medical_id.clear()
+        self.medical_history.clear()
 
     def add_employee(self):
         if not self.valid():
@@ -148,14 +157,20 @@ class MainWindow(QMainWindow):
 
         row = self.table.rowCount()
         self.table.insertRow(row)
-        self.table.setItem(row, 0, QTableWidgetItem(
-            self.first_name.text().strip())
+        self.table.setItem(
+            row, 0, QTableWidgetItem(self.first_name.text().strip())
         )
         self.table.setItem(
-            row, 1, QTableWidgetItem(self.last_name.text())
+            row, 1, QTableWidgetItem(self.last_name.text().strip())
         )
         self.table.setItem(
-            row, 2, QTableWidgetItem(self.birth_date.text())
+            row, 2, QTableWidgetItem(self.middle_name.text().strip())
+        )
+        self.table.setItem(
+            row, 3, QTableWidgetItem(self.birth_date.text().strip())
+        )
+        self.table.setItem(
+            row, 4, QTableWidgetItem(self.medical_id.text().strip())
         )
 
         self.reset()
