@@ -55,7 +55,6 @@ class MainWindow(QMainWindow):
         self.last_name = QLineEdit(form)
         self.middle_name = QLineEdit(form)
         self.birth_date = QDateEdit(calendarPopup=True)
-        # self.birth_date.clear()
         self.medical_id = QLineEdit(form)
         self.medical_history = QTextEdit(form)
 
@@ -84,6 +83,10 @@ class MainWindow(QMainWindow):
         details_action.triggered.connect(self.delete)
         toolbar.addAction(details_action)
 
+        diagnostic_action = QAction(QIcon('./assets/diagnostic.png'), '&Delete', self)
+        diagnostic_action.triggered.connect(self.delete)
+        toolbar.addAction(diagnostic_action)
+
         dock.setWidget(form)
 
 
@@ -95,7 +98,7 @@ class MainWindow(QMainWindow):
         button = QMessageBox.question(
             self,
             'Подтверждение',
-            'ВЫ уверены, что хотите удалить выбранную запись?',
+            'Вы уверены, что хотите удалить выбранную запись?',
             QMessageBox.StandardButton.Yes |
             QMessageBox.StandardButton.No
         )
