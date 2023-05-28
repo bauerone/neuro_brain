@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt,QSize
 from PyQt6.QtGui import QIcon, QAction
+from diagnostic_window import DiagnosticWindow
+from details_window import DetailsWindow
 import sys
 
 class MainWindow(QMainWindow):
@@ -79,12 +81,12 @@ class MainWindow(QMainWindow):
         delete_action.triggered.connect(self.delete)
         toolbar.addAction(delete_action)
 
-        details_action = QAction(QIcon('./assets/details.png'), '&Delete', self)
-        details_action.triggered.connect(self.delete)
+        details_action = QAction(QIcon('./assets/details.png'), '&Show details', self)
+        details_action.triggered.connect(self.show_details_window)
         toolbar.addAction(details_action)
 
-        diagnostic_action = QAction(QIcon('./assets/diagnostic.png'), '&Delete', self)
-        diagnostic_action.triggered.connect(self.delete)
+        diagnostic_action = QAction(QIcon('./assets/diagnostic.png'), '&Show diagnostic', self)
+        diagnostic_action.triggered.connect(self.show_diagnostic_window)
         toolbar.addAction(diagnostic_action)
 
         dock.setWidget(form)
@@ -104,6 +106,22 @@ class MainWindow(QMainWindow):
         )
         if button == QMessageBox.StandardButton.Yes:
             self.table.removeRow(current_row)
+
+    def show_details_window(self):
+        current_row = self.table.currentRow()
+        if current_row < 0:
+            return QMessageBox.warning(self, 'Внимание', 'Выберите запись для отображения детальной информации')
+        
+        self.details_window = DetailsWindow()
+        self.details_window.show()
+    
+    def show_diagnostic_window(self):
+        current_row = self.table.currentRow()
+        if current_row < 0:
+            return QMessageBox.warning(self, 'Внимание','Выберите запись для отображения окна диагностики')
+        
+        self.diagnostic_window = DiagnosticWindow()
+        self.diagnostic_window.show()
 
     def valid(self):
         first_name = self.first_name.text().strip()
