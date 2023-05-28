@@ -3,11 +3,15 @@ from PyQt6.QtCore import Qt,QSize
 from PyQt6.QtGui import QIcon, QAction
 from diagnostic_window import DiagnosticWindow
 from details_window import DetailsWindow
+from db_interface import DbInterface
 import sys
 
 class MainWindow(QMainWindow):
+    db = DbInterface()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        DbInterface()
         self.setWindowTitle('СИСТЕМА РАСПОЗНАВАНИЯ ПАТОЛОГИЙ В МОЗГЕ')
         self.setGeometry(100, 100, 600, 400)
 
@@ -129,7 +133,7 @@ class MainWindow(QMainWindow):
         middle_name = self.middle_name.text().strip()
         birth_date = self.birth_date.text().strip()
         medical_id = self.medical_id.text().strip()
-        medical_history = self.medical_history.toPlainText()
+        medical_history = self.medical_history.toPlainText().strip()
 
         
         if not first_name:
@@ -175,6 +179,15 @@ class MainWindow(QMainWindow):
     def add_employee(self):
         if not self.valid():
             return
+        
+        self.db.add_patient(
+            self.first_name.text().strip(),
+            self.last_name.text().strip(),
+            self.middle_name.text().strip(),
+            self.birth_date.text().strip(),
+            self.medical_id.text().strip(),
+            self.medical_history.toPlainText().strip()
+        )
 
         row = self.table.rowCount()
         self.table.insertRow(row)
