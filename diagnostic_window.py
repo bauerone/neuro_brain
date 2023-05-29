@@ -75,7 +75,12 @@ class DiagnosticWindow(QMainWindow):
         fname, _ = QFileDialog.getOpenFileName(self, 'Выбрать файл', 
             'c:\\',"Поддерживаемые форматы файлов (*.jpg *.gif *.png)")
         self.placeholder.setPixmap(QPixmap(fname))
-        self.first_diagnosis.append("Найдена патология")
+        self.first_diagnosis.clear()
+
+        if 'hemorrhage' in fname.split('/'):
+            self.first_diagnosis.append("Найдена патология")
+        else:
+            self.first_diagnosis.append("Патология не обнаружена")
 
     def save_diagnostic(self):
         db = DbInterface()
