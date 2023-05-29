@@ -1,11 +1,14 @@
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from PyQt6.QtCore import Qt
+from db_interface import DbInterface
+from datetime import date
 
 class DiagnosticWindow(QMainWindow):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, patient_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.patient = DbInterface().load_patient(patient_id)
         self.setWindowTitle("Диагностика")
 
         wid = QWidget(self)
@@ -25,13 +28,13 @@ class DiagnosticWindow(QMainWindow):
         self.patient_label = QLabel('Пациент:')
         left_column_layout.addWidget(self.patient_label)
 
-        self.patient_name = QLabel('Малахов Дмитрий Витальевич')
+        self.patient_name = QLabel('%s %s %s'%(self.patient[2], self.patient[1], self.patient[3]))
         left_column_layout.addWidget(self.patient_name)
 
         self.medical_id_label = QLabel('Номер полиса:')
         left_column_layout.addWidget(self.medical_id_label)
 
-        self.medical_id = QLabel('7683543434')
+        self.medical_id = QLabel(self.patient[5])
         left_column_layout.addWidget(self.medical_id)
 
         self.first_diagnosis_label = QLabel('Первичный диагноз:')
@@ -72,6 +75,13 @@ class DiagnosticWindow(QMainWindow):
         fname, _ = QFileDialog.getOpenFileName(self, 'Выбрать файл', 
             'c:\\',"Поддерживаемые форматы файлов (*.jpg *.gif *.png)")
         self.placeholder.setPixmap(QPixmap(fname))
+        self.first_diagnosis.append("Найдена патология")
 
     def save_diagnostic(self):
-        print('Saved')
+        db = DbInterface()
+        db.add_diagnostic(self.patient[0],
+                          self.first_diagnosis.toPlainText().strip(),
+                          self.final_diagnosis.toPlainText().strip(),
+                          self.therapy.toPlainText().strip(),
+                          date.today().strftime("%m-%d-%Y"))
+        

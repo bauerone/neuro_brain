@@ -11,47 +11,39 @@ class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        DbInterface()
         self.setWindowTitle('СИСТЕМА РАСПОЗНАВАНИЯ ПАТОЛОГИЙ В МОЗГЕ')
         self.setGeometry(100, 100, 600, 400)
 
-        employees = [
-            {'first_name': 'John',
-             'last_name': 'Doe',
-             'middle_name': 'Smith',
-             'birth_date': '22.12.1997',
-             'medical_id': '2324343',
-             'medical_history': 'Голова болит'
-            },
-        ]
+        patients = self.db.load_patients()
 
         self.table = QTableWidget(self)
         self.setCentralWidget(self.table)
 
-        self.table.setColumnCount(5)
-        self.table.setColumnWidth(0, 150)
+        self.table.setColumnCount(6)
+        self.table.setColumnWidth(0, 50)
         self.table.setColumnWidth(1, 150)
         self.table.setColumnWidth(2, 150)
         self.table.setColumnWidth(3, 150)
         self.table.setColumnWidth(4, 150)
+        self.table.setColumnWidth(5, 150)
 
-        self.table.setHorizontalHeaderLabels(['Имя', 'Фамилия', 'Отчество', 'Дата рождения', 'Номер полиса'])
-        self.table.setRowCount(len(employees))
+        self.table.setHorizontalHeaderLabels(['id в БД', 'Имя', 'Фамилия', 'Отчество', 'Дата рождения', 'Номер полиса'])
+        self.table.setRowCount(len(patients))
 
         row = 0
-        for e in employees:
-            self.table.setItem(row, 0, QTableWidgetItem(e['first_name']))
-            self.table.setItem(row, 1, QTableWidgetItem(e['last_name']))
-            self.table.setItem(row, 2, QTableWidgetItem(e['middle_name']))
-            self.table.setItem(row, 3, QTableWidgetItem(e['birth_date']))
-            self.table.setItem(row, 4, QTableWidgetItem(e['medical_id']))
+        for e in patients:
+            self.table.setItem(row, 0, QTableWidgetItem(str(e[0])))
+            self.table.setItem(row, 1, QTableWidgetItem(e[1]))
+            self.table.setItem(row, 2, QTableWidgetItem(e[2]))
+            self.table.setItem(row, 3, QTableWidgetItem(e[3]))
+            self.table.setItem(row, 4, QTableWidgetItem(e[4]))
+            self.table.setItem(row, 5, QTableWidgetItem(e[5]))
             row += 1
 
         dock = QDockWidget('Новый пациент')
         dock.setFeatures(QDockWidget.DockWidgetFeature.NoDockWidgetFeatures)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
-        # create form
         form = QWidget()
         layout = QFormLayout(form)
         form.setLayout(layout)
@@ -72,7 +64,7 @@ class MainWindow(QMainWindow):
         layout.addRow('История болезни', self.medical_history)
 
         btn_add = QPushButton('Добавить')
-        btn_add.clicked.connect(self.add_employee)
+        btn_add.clicked.connect(self.add_patient)
         layout.addRow(btn_add)
 
         # add delete & edit button
@@ -124,7 +116,7 @@ class MainWindow(QMainWindow):
         if current_row < 0:
             return QMessageBox.warning(self, 'Внимание','Выберите запись для отображения окна диагностики')
         
-        self.diagnostic_window = DiagnosticWindow()
+        self.diagnostic_window = DiagnosticWindow(self.table.model().data(self.table.model().index(current_row, 0)))
         self.diagnostic_window.show()
 
     def valid(self):
@@ -176,7 +168,7 @@ class MainWindow(QMainWindow):
         self.medical_id.clear()
         self.medical_history.clear()
 
-    def add_employee(self):
+    def add_patient(self):
         if not self.valid():
             return
         

@@ -45,3 +45,38 @@ class DbInterface:
         cursor.execute(sqlite_insert_patient_query)
         sqlite_connection.commit()
         sqlite_connection.close()
+
+    def load_patients(self):
+        sqlite_connection = sqlite3.connect('sqlite_python.db')
+        cursor = sqlite_connection.cursor()
+
+        sqlite_fetch_patients_query = """SELECT * FROM patients ORDER BY id ASC"""
+
+        cursor.execute(sqlite_fetch_patients_query)
+        patients = cursor.fetchall()
+        sqlite_connection.close()
+
+        return patients
+
+    def load_patient(self, patient_id):
+        sqlite_connection = sqlite3.connect('sqlite_python.db')
+        cursor = sqlite_connection.cursor()
+
+        sqlite_fetch_patients_query = """SELECT * FROM patients WHERE id=%s LIMIT 1"""%(patient_id)
+
+        cursor.execute(sqlite_fetch_patients_query)
+        patient = cursor.fetchone()
+        sqlite_connection.close()
+
+        return patient
+    
+    def add_diagnostic(self, patient_id, first_diagnosis, final_diagnosis, therapy, date):
+        sqlite_connection = sqlite3.connect('sqlite_python.db')
+        cursor = sqlite_connection.cursor()
+        sqlite_insert_diagnostic_query = """INSERT INTO diagnostics
+                                        (patient_id, first_diagnosis, final_diagnosis, therapy, date)
+                                        VALUES  ('%s', '%s', '%s', '%s', '%s');"""%(patient_id, first_diagnosis, final_diagnosis, therapy, date)
+        
+        cursor.execute(sqlite_insert_diagnostic_query)
+        sqlite_connection.commit()
+        sqlite_connection.close()
