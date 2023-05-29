@@ -72,11 +72,6 @@ class MainWindow(QMainWindow):
         toolbar.setIconSize(QSize(16,16))
         self.addToolBar(toolbar)
 
-
-        delete_action = QAction(QIcon('./assets/delete.png'), '&Delete', self)
-        delete_action.triggered.connect(self.delete)
-        toolbar.addAction(delete_action)
-
         details_action = QAction(QIcon('./assets/details.png'), '&Show details', self)
         details_action.triggered.connect(self.show_details_window)
         toolbar.addAction(details_action)
@@ -87,28 +82,12 @@ class MainWindow(QMainWindow):
 
         dock.setWidget(form)
 
-
-    def delete(self):
-        current_row = self.table.currentRow()
-        if current_row < 0:
-            return QMessageBox.warning(self, 'Внимание','Выберите запись для удаления')
-
-        button = QMessageBox.question(
-            self,
-            'Подтверждение',
-            'Вы уверены, что хотите удалить выбранную запись?',
-            QMessageBox.StandardButton.Yes |
-            QMessageBox.StandardButton.No
-        )
-        if button == QMessageBox.StandardButton.Yes:
-            self.table.removeRow(current_row)
-
     def show_details_window(self):
         current_row = self.table.currentRow()
         if current_row < 0:
             return QMessageBox.warning(self, 'Внимание', 'Выберите запись для отображения детальной информации')
         
-        self.details_window = DetailsWindow()
+        self.details_window = DetailsWindow(self.table.model().data(self.table.model().index(current_row, 0)))
         self.details_window.show()
     
     def show_diagnostic_window(self):
@@ -181,22 +160,28 @@ class MainWindow(QMainWindow):
             self.medical_history.toPlainText().strip()
         )
 
+        patient = self.db.last_patient()
+        print(patient)
+
         row = self.table.rowCount()
         self.table.insertRow(row)
         self.table.setItem(
-            row, 0, QTableWidgetItem(self.first_name.text().strip())
+            row, 0, QTableWidgetItem(str(patient[0]))
         )
         self.table.setItem(
-            row, 1, QTableWidgetItem(self.last_name.text().strip())
+            row, 1, QTableWidgetItem(patient[1])
         )
         self.table.setItem(
-            row, 2, QTableWidgetItem(self.middle_name.text().strip())
+            row, 2, QTableWidgetItem(patient[2])
         )
         self.table.setItem(
-            row, 3, QTableWidgetItem(self.birth_date.text().strip())
+            row, 3, QTableWidgetItem(patient[3])
         )
         self.table.setItem(
-            row, 4, QTableWidgetItem(self.medical_id.text().strip())
+            row, 4, QTableWidgetItem(patient[4])
+        )
+        self.table.setItem(
+            row, 5, QTableWidgetItem(patient[5])
         )
 
         self.reset()

@@ -70,6 +70,18 @@ class DbInterface:
 
         return patient
     
+    def last_patient(self):
+        sqlite_connection = sqlite3.connect('sqlite_python.db')
+        cursor = sqlite_connection.cursor()
+
+        sqlite_fetch_patients_query = """SELECT * FROM patients ORDER BY id DESC LIMIT 1"""
+
+        cursor.execute(sqlite_fetch_patients_query)
+        patient = cursor.fetchone()
+        sqlite_connection.close()
+
+        return patient
+    
     def add_diagnostic(self, patient_id, first_diagnosis, final_diagnosis, therapy, date):
         sqlite_connection = sqlite3.connect('sqlite_python.db')
         cursor = sqlite_connection.cursor()
@@ -80,3 +92,16 @@ class DbInterface:
         cursor.execute(sqlite_insert_diagnostic_query)
         sqlite_connection.commit()
         sqlite_connection.close()
+    
+    def find_diagnostics_for_patient(self, patient_id):
+        sqlite_connection = sqlite3.connect('sqlite_python.db')
+        cursor = sqlite_connection.cursor()
+        sqlite_find_diagnostics_query = """SELECT * FROM diagnostics WHERE patient_id=%s ORDER BY id ASC"""%(patient_id)
+
+        cursor.execute(sqlite_find_diagnostics_query)
+        diagnostics = cursor.fetchall()
+        sqlite_connection.close()
+
+        print(diagnostics)
+
+        return diagnostics
